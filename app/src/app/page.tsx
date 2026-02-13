@@ -1,194 +1,198 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, Code, User, Send } from "lucide-react";
-import Link from "next/link";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Github, Linkedin, Mail, Code, User, Send, Rocket, Cpu } from "lucide-react";
 
-// --- CONFIGURAÇÃO DAS ANIMAÇÕES ---
-const fadeInUp = {
-  hidden: { opacity: 0, y: 60 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+// --- CONFIGURAÇÃO DAS ANIMAÇÕES (EFEITO HIPERESPAÇO) ---
+const pageVariants = {
+  initial: { opacity: 0, scale: 0.8, filter: "blur(10px)" },
+  in: { opacity: 1, scale: 1, filter: "blur(0px)" },
+  out: { opacity: 0, scale: 1.5, filter: "blur(20px)" }
 };
 
-const staggerContainer = {
-  visible: { transition: { staggerChildren: 0.2 } }
-};
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.8
+} as const;
 
 export default function Portfolio() {
+  // O ESTADO QUE CONTROLA QUAL TELA ESTÁ VISÍVEL
+  const [activeTab, setActiveTab] = useState("home");
+
   return (
-    // Container Principal com Scroll Snap
-    <main className="h-screen w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar scroll-smooth relative bg-space-900">
+    <main className="h-screen w-screen relative overflow-hidden bg-space-900 text-white flex flex-col items-center justify-center">
       
-      {/* --- BACKGROUND FIXO (ESTRELAS) --- */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        {/* Estrelas geradas dinamicamente */}
-        {[...Array(50)].map((_, i) => (
-          <motion.div
+      {/* --- BACKGROUND ESTÁTICO (Nunca muda) --- */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-slate-900 via-space-900 to-black"></div>
+        {/* Estrelas simples */}
+        {[...Array(40)].map((_, i) => (
+          <div
             key={i}
-            className="absolute bg-white rounded-full"
-            initial={{ opacity: 0.1, scale: 0.5 }}
-            animate={{ opacity: [0.2, 1, 0.2], scale: [1, 1.5, 1] }}
-            transition={{ duration: Math.random() * 3 + 2, repeat: Infinity }}
+            className="absolute bg-white rounded-full animate-pulse"
             style={{
-              width: Math.random() * 3 + 'px',
-              height: Math.random() * 3 + 'px',
-              top: Math.random() * 100 + '%',
-              left: Math.random() * 100 + '%',
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3}px`,
+              height: `${Math.random() * 3}px`,
+              opacity: Math.random(),
+              animationDuration: `${Math.random() * 3 + 2}s`
             }}
           />
         ))}
-        {/* Brilho Roxo de Fundo (Nebulosa) */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-900/20 blur-[120px] rounded-full" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-900/20 blur-[120px] rounded-full" />
       </div>
 
-      {/* --- MENU DE NAVEGAÇÃO FLUTUANTE --- */}
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white/5 backdrop-blur-md border border-white/10 px-6 py-3 rounded-full flex gap-8">
-        <NavLink href="#home" icon={<User size={20} />} label="Início" />
-        <NavLink href="#projetos" icon={<Code size={20} />} label="Projetos" />
-        <NavLink href="#contato" icon={<Send size={20} />} label="Contato" />
+      {/* --- MENU DE NAVEGAÇÃO --- */}
+      <nav className="fixed top-8 z-50 bg-white/5 backdrop-blur-md border border-white/10 px-2 py-2 rounded-full flex gap-2">
+        <NavButton active={activeTab === "home"} onClick={() => setActiveTab("home")} icon={<User size={18} />} label="Base" />
+        <NavButton active={activeTab === "projetos"} onClick={() => setActiveTab("projetos")} icon={<Code size={18} />} label="Missões" />
+        <NavButton active={activeTab === "contato"} onClick={() => setActiveTab("contato")} icon={<Send size={18} />} label="Sinal" />
       </nav>
 
-      {/* --- SESSÃO 1: HOME --- */}
-      <section id="home" className="h-screen w-full snap-start flex items-center justify-center relative z-10 p-6">
-        <motion.div 
-          initial="hidden" 
-          whileInView="visible" 
-          viewport={{ once: false }} // Anima toda vez que entra na tela
-          variants={staggerContainer}
-          className="text-center max-w-4xl"
-        >
-          <motion.p variants={fadeInUp} className="text-cyan-400 font-medium mb-4 tracking-widest uppercase text-sm">
-            Bem-vindo ao meu universo
-          </motion.p>
-          <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold mb-6 text-white bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-cyan-400">
-            João Vitor
-          </motion.h1>
-          <motion.p variants={fadeInUp} className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Desenvolvedor Full Stack & Explorador de Dados. <br/>
-            Construindo soluções robustas com <span className="text-white font-mono">Next.js</span> e <span className="text-white font-mono">Astronomia</span>.
-          </motion.p>
-        </motion.div>
-      </section>
-
-      {/* --- SESSÃO 2: PROJETOS --- */}
-      <section id="projetos" className="h-screen w-full snap-start flex flex-col items-center justify-center relative z-10 p-6 bg-black/20">
-        <motion.div 
-          initial="hidden" 
-          whileInView="visible" 
-          viewport={{ once: false }}
-          variants={staggerContainer}
-          className="max-w-6xl w-full"
-        >
-          <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-12 text-center text-white">
-            Missões Recentes
-          </motion.h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* CARD DO PROJETO UNIVERSE - SEU DESTAQUE */}
-            <motion.div variants={fadeInUp} className="group relative bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2">
-              <div className="absolute top-4 right-4 bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs font-mono border border-purple-500/30">
-                EM DESENVOLVIMENTO
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                Project Universe
-              </h3>
-              <p className="text-gray-400 mb-6 text-sm">
-                Uma aplicação Full-stack ambiciosa. Aprimorando habilidades de desenvolvimento com foco em escalabilidade e design moderno.
-              </p>
-              <div className="flex gap-2 mb-6">
-                <TechBadge name="Next.js" />
-                <TechBadge name="TypeScript" />
-                <TechBadge name="Node" />
-              </div>
-              <a href="https://github.com/joaovitor8/universe" target="_blank" className="inline-flex items-center text-sm font-medium text-white hover:text-cyan-400 gap-2">
-                Ver Código na Base <Github size={16} />
-              </a>
-            </motion.div>
-
-            {/* CARD SECUNDÁRIO (Exemplo: Data Science) */}
-            <motion.div variants={fadeInUp} className="group relative bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2">
-               <div className="absolute top-4 right-4 bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-mono border border-blue-500/30">
-                EM BREVE
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                Análise de Dados Estelar
-              </h3>
-              <p className="text-gray-400 mb-6 text-sm">
-                Projeto focado em Ciência de Dados, analisando padrões complexos para portfólio.
-              </p>
-              <div className="flex gap-2 mb-6">
-                <TechBadge name="Python" />
-                <TechBadge name="Pandas" />
-                <TechBadge name="AI" />
-              </div>
-              <span className="inline-flex items-center text-sm font-medium text-gray-500 cursor-not-allowed gap-2">
-                Aguardando lançamento... <Code size={16} />
-              </span>
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* --- SESSÃO 3: CONTATO --- */}
-      <section id="contato" className="h-screen w-full snap-start flex items-center justify-center relative z-10 p-6">
-        <motion.div 
-          initial="hidden" 
-          whileInView="visible" 
-          viewport={{ once: false }}
-          variants={staggerContainer}
-          className="text-center bg-white/5 backdrop-blur-lg p-10 rounded-3xl border border-white/10 max-w-lg w-full"
-        >
-          <motion.div variants={fadeInUp} className="mb-6 mx-auto bg-linear-to-br from-purple-500 to-cyan-500 w-16 h-16 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/30">
-            <Mail className="text-white" size={32} />
-          </motion.div>
+      {/* --- ÁREA DE CONTEÚDO (Muda conforme o estado) --- */}
+      <div className="z-10 w-full max-w-5xl px-6">
+        <AnimatePresence mode="wait">
           
-          <motion.h2 variants={fadeInUp} className="text-3xl font-bold text-white mb-4">
-            Vamos conversar?
-          </motion.h2>
-          <motion.p variants={fadeInUp} className="text-gray-400 mb-8">
-            Estou disponível para novas oportunidades. <br/>Mande um sinal e eu respondo na velocidade da luz.
-          </motion.p>
+          {/* TELA 1: HOME */}
+          {activeTab === "home" && (
+            <motion.div
+              key="home"
+              initial="initial"
+              animate="in"
+              exit="out"
+              variants={pageVariants}
+              transition={pageTransition}
+              className="text-center flex flex-col items-center"
+            >
+              <div className="mb-6 relative">
+                <div className="absolute -inset-4 bg-purple-500/30 blur-xl rounded-full"></div>
+                <Rocket size={64} className="relative text-purple-400" />
+              </div>
+              <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-cyan-400">
+                João Vitor
+              </h1>
+              <h2 className="text-xl text-gray-400 mb-8 max-w-lg">
+                Desenvolvedor Full Stack & Estudante de Ciência da Computação.
+                Transformando ideias em código estelar.
+              </h2>
+              <button 
+                onClick={() => setActiveTab("projetos")}
+                className="px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-all shadow-[0_0_20px_rgba(147,51,234,0.5)]"
+              >
+                Iniciar Exploração
+              </button>
+            </motion.div>
+          )}
 
-          <motion.div variants={fadeInUp} className="flex justify-center gap-6">
-            <SocialLink href="https://github.com/joaovitor8" icon={<Github size={24} />} />
-            <SocialLink href="https://linkedin.com" icon={<Linkedin size={24} />} />
-            <SocialLink href="mailto:seuemail@email.com" icon={<Mail size={24} />} />
-          </motion.div>
-        </motion.div>
-      </section>
+          {/* TELA 2: PROJETOS */}
+          {activeTab === "projetos" && (
+            <motion.div
+              key="projetos"
+              initial="initial"
+              animate="in"
+              exit="out"
+              variants={pageVariants}
+              transition={pageTransition}
+              className="w-full"
+            >
+              <h2 className="text-3xl font-bold text-center mb-10 text-white">Log de Projetos</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Projeto Universe */}
+                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-colors group">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-purple-300">Project Universe</h3>
+                    <Github className="text-gray-500 group-hover:text-white transition-colors cursor-pointer" />
+                  </div>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Aplicação Full-stack focada em performance e design. Meu campo de testes para tecnologias modernas.
+                  </p>
+                  <div className="flex gap-2">
+                    <Badge>Next.js</Badge>
+                    <Badge>TypeScript</Badge>
+                  </div>
+                </div>
 
+                {/* Projeto Data Science */}
+                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-colors">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-cyan-300">Análise de Dados</h3>
+                    <Cpu className="text-gray-500" />
+                  </div>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Estudos em ciência de dados e algoritmos complexos. Em breve no portfólio.
+                  </p>
+                  <div className="flex gap-2">
+                    <Badge>Python</Badge>
+                    <Badge>Data</Badge>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TELA 3: CONTATO */}
+          {activeTab === "contato" && (
+            <motion.div
+              key="contato"
+              initial="initial"
+              animate="in"
+              exit="out"
+              variants={pageVariants}
+              transition={pageTransition}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="p-4 bg-white/5 rounded-full mb-6 border border-white/10">
+                <Mail size={40} className="text-cyan-400" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4">Estabelecer Conexão</h2>
+              <p className="text-gray-400 max-w-md mb-8">
+                Estou disponível para projetos freelance e oportunidades de carreira.
+              </p>
+              
+              <div className="flex gap-4">
+                <a href="https://github.com/joaovitor8" target="_blank" className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all">
+                  <Github size={20} /> GitHub
+                </a>
+                <a href="#" className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all">
+                  <Linkedin size={20} /> LinkedIn
+                </a>
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </div>
     </main>
   );
 }
 
-// --- COMPONENTES MENORES PARA ORGANIZAÇÃO ---
+// --- COMPONENTES AUXILIARES ---
 
-function NavLink({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+function NavButton({ active, onClick, icon, label }: any) {
   return (
-    <Link href={href} className="group flex flex-col items-center gap-1 text-gray-400 hover:text-cyan-400 transition-colors">
-      <div className="group-hover:-translate-y-1 transition-transform duration-300">
-        {icon}
-      </div>
-      <span className="text-[10px] uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-5">
-        {label}
-      </span>
-    </Link>
-  );
-}
-
-function TechBadge({ name }: { name: string }) {
-  return (
-    <span className="px-3 py-1 bg-white/5 rounded text-xs text-gray-300 border border-white/5">
-      {name}
-    </span>
-  );
-}
-
-function SocialLink({ href, icon }: { href: string; icon: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" className="p-3 bg-white/5 rounded-full hover:bg-white/10 hover:text-cyan-400 hover:scale-110 transition-all border border-white/5">
+    <button
+      onClick={onClick}
+      className={`
+        flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+        ${active 
+          ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.5)]" 
+          : "text-gray-400 hover:text-white hover:bg-white/5"
+        }
+      `}
+    >
       {icon}
-    </a>
+      <span className={`${active ? "inline-block" : "hidden md:inline-block"}`}>{label}</span>
+    </button>
+  );
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="px-2 py-1 rounded bg-white/5 border border-white/5 text-xs text-gray-300">
+      {children}
+    </span>
   );
 }

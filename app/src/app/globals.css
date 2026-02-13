@@ -1,61 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  /* Cores personalizadas (disponíveis como bg-space-900, text-nebula-primary, etc) */
   --color-space-900: #0B0C10;
-  --color-space-800: #1F2833;
-  
-  --color-nebula-primary: #8B5CF6;   /* Violet-500 */
-  --color-nebula-secondary: #06B6D4; /* Cyan-500 */
-  
-  --color-starlight: #C5C6C7;        /* Cinza claro */
-  --color-highlight: #66FCF1;        /* Azul neon */
-
-  /* Animações personalizadas */
-  --animate-twinkle: twinkle 3s ease-in-out infinite;
-  --animate-float: float 6s ease-in-out infinite;
+  --color-nebula-primary: #8B5CF6;
+  --color-nebula-secondary: #06B6D4;
 }
 
-/* Definição das animações (Keyframes padrão CSS) */
-@keyframes twinkle {
-  0%, 100% { opacity: 0.2; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-/* Configurações Globais */
 :root {
   --foreground-rgb: 255, 255, 255;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background-color: var(--color-space-900); 
-  background-attachment: fixed;
-  overflow: hidden; /* Esconde a barra de rolagem geral */
-}
-
-/* Utilitários */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  background-color: var(--color-space-900);
+  color: white;
+  overflow: hidden; /* Impede qualquer rolagem */
+  font-family: system-ui, -apple-system, sans-serif;
 }

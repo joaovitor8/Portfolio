@@ -7,14 +7,13 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space
 
 export const metadata: Metadata = {
   title: "João Vitor | Full Stack Developer",
-  description: "Portfólio de desenvolvimento Full Stack.",
+  description: "Portfólio de desenvolvimento",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-br">
       <body className={`${inter.variable} ${spaceGrotesk.variable} bg-space-900 text-starlight antialiased`}>
-        {/* Aqui você pode colocar um Navbar fixo depois */}
         {children}
       </body>
     </html>
