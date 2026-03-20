@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, Linkedin, Mail, Code, User, Send, Rocket, Cpu } from "lucide-react";
+import { Github, Linkedin, Mail, Code, User, Send, Rocket } from "lucide-react";
 
 // --- CONFIGURAÇÃO DAS ANIMAÇÕES (EFEITO HIPERESPAÇO) ---
 const pageVariants = {
@@ -18,27 +18,65 @@ const pageTransition = {
 } as const;
 
 export default function Portfolio() {
-  // O ESTADO QUE CONTROLA QUAL TELA ESTÁ VISÍVEL
   const [activeTab, setActiveTab] = useState("home");
+  
+  const [repos, setRepos] = useState<any[]>([]); 
+  const [loadingRepos, setLoadingRepos] = useState(false);
+  
+  const [stars, setStars] = useState<any[]>([]);
+
+  const projetosDestaque = ["Universe", "ControleFinanceiro"]; 
+
+  useEffect(() => {
+    const starData = [...Array(40)].map((_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      width: `${Math.random() * 3}px`,
+      height: `${Math.random() * 3}px`,
+      opacity: Math.random(),
+      animationDuration: `${Math.random() * 3 + 2}s`
+    }));
+    setStars(starData);
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "projetos" && repos.length === 0) {
+      setLoadingRepos(true);
+      
+      fetch("https://api.github.com/users/joaovitor8/repos")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            const projetosFiltrados = data.filter((repo: any) => 
+              projetosDestaque.includes(repo.name)
+            );
+            setRepos(projetosFiltrados);
+          }
+        })
+        .catch((err) => console.error("Erro ao buscar do GitHub:", err))
+        .finally(() => setLoadingRepos(false));
+    }
+  }, [activeTab, repos.length]); 
 
   return (
     <main className="h-screen w-screen relative overflow-hidden bg-space-900 text-white flex flex-col items-center justify-center">
       
-      {/* --- BACKGROUND ESTÁTICO (Nunca muda) --- */}
+      {/* --- BACKGROUND ESTÁTICO --- */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-slate-900 via-space-900 to-black"></div>
-        {/* Estrelas simples */}
-        {[...Array(40)].map((_, i) => (
+
+        {stars.map((star) => (
           <div
-            key={i}
+            key={star.id}
             className="absolute bg-white rounded-full animate-pulse"
             style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 3}px`,
-              height: `${Math.random() * 3}px`,
-              opacity: Math.random(),
-              animationDuration: `${Math.random() * 3 + 2}s`
+              top: star.top,
+              left: star.left,
+              width: star.width,
+              height: star.height,
+              opacity: star.opacity,
+              animationDuration: star.animationDuration
             }}
           />
         ))}
@@ -51,7 +89,7 @@ export default function Portfolio() {
         <NavButton active={activeTab === "contato"} onClick={() => setActiveTab("contato")} icon={<Send size={18} />} label="Sinal" />
       </nav>
 
-      {/* --- ÁREA DE CONTEÚDO (Muda conforme o estado) --- */}
+      {/* --- ÁREA DE CONTEÚDO --- */}
       <div className="z-10 w-full max-w-5xl px-6">
         <AnimatePresence mode="wait">
           
@@ -70,7 +108,7 @@ export default function Portfolio() {
                 <div className="absolute -inset-4 bg-purple-500/30 blur-xl rounded-full"></div>
                 <Rocket size={64} className="relative text-purple-400" />
               </div>
-              <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-cyan-400">
+              <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
                 João Vitor
               </h1>
               <h2 className="text-xl text-gray-400 mb-8 max-w-lg">
@@ -99,37 +137,42 @@ export default function Portfolio() {
             >
               <h2 className="text-3xl font-bold text-center mb-10 text-white">Log de Projetos</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Projeto Universe */}
-                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-colors group">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold text-purple-300">Project Universe</h3>
-                    <Github className="text-gray-500 group-hover:text-white transition-colors cursor-pointer" />
-                  </div>
-                  <p className="text-gray-400 text-sm mb-4">
-                    Aplicação Full-stack focada em performance e design. Meu campo de testes para tecnologias modernas.
-                  </p>
-                  <div className="flex gap-2">
-                    <Badge>Next.js</Badge>
-                    <Badge>TypeScript</Badge>
-                  </div>
+              {loadingRepos ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {repos.length > 0 ? (
+                    repos.map((repo: any) => (
+                      <div key={repo.id} className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-colors group flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-xl font-bold text-cyan-300 capitalize">
+                              {repo.name.replace(/-/g, ' ')}
+                            </h3>
+                            <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                              <Github className="text-gray-500 group-hover:text-white transition-colors cursor-pointer" />
+                            </a>
+                          </div>
+                          
+                          <p className="text-gray-400 text-sm mb-6">
+                            {repo.description || "Projeto exploratório focado em desenvolvimento de software e novas tecnologias."}
+                          </p>
+                        </div>
 
-                {/* Projeto Data Science */}
-                <div className="bg-white/5 border border-white/10 p-6 rounded-2xl hover:bg-white/10 transition-colors">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-bold text-cyan-300">Análise de Dados</h3>
-                    <Cpu className="text-gray-500" />
-                  </div>
-                  <p className="text-gray-400 text-sm mb-4">
-                    Estudos em ciência de dados e algoritmos complexos. Em breve no portfólio.
-                  </p>
-                  <div className="flex gap-2">
-                    <Badge>Python</Badge>
-                    <Badge>Data</Badge>
-                  </div>
+                        <div className="flex gap-2">
+                          {repo.language && (
+                            <Badge>{repo.language}</Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-400 col-span-2">Nenhuma missão encontrada nos registros.</p>
+                  )}
                 </div>
-              </div>
+              )}
             </motion.div>
           )}
 
@@ -156,7 +199,7 @@ export default function Portfolio() {
                 <a href="https://github.com/joaovitor8" target="_blank" className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all">
                   <Github size={20} /> GitHub
                 </a>
-                <a href="#" className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all">
+                <a href="https://www.linkedin.com/in/joaovitorezequiel/" target="_blank" className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all">
                   <Linkedin size={20} /> LinkedIn
                 </a>
               </div>
@@ -171,7 +214,14 @@ export default function Portfolio() {
 
 // --- COMPONENTES AUXILIARES ---
 
-function NavButton({ active, onClick, icon, label }: any) {
+interface NavButtonProps {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}
+
+function NavButton({ active, onClick, icon, label }: NavButtonProps) {
   return (
     <button
       onClick={onClick}
