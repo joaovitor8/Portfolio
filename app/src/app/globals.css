@@ -39,6 +39,12 @@ body {
   color: #fff;
 }
 
+/* Foco visível só em navegação por teclado, com cor da marca */
+:focus-visible {
+  outline: 2px solid var(--color-cyan-soft);
+  outline-offset: 3px;
+}
+
 /* Scrollbar refinada */
 ::-webkit-scrollbar {
   width: 10px;
