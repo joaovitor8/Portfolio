@@ -1,18 +1,120 @@
 @import "tailwindcss";
 
 @theme {
+  --color-space-950: #050610;
   --color-space-900: #0B0C10;
-  --color-nebula-primary: #8B5CF6;
-  --color-nebula-secondary: #06B6D4;
+  --color-space-800: #11131C;
+  --color-space-700: #1A1D2B;
+  --color-nebula-500: #8B5CF6;
+  --color-nebula-400: #A78BFA;
+  --color-nebula-300: #C4B5FD;
+  --color-cyan-glow: #06B6D4;
+  --color-cyan-soft: #67E8F9;
+  --color-starlight: #E5E7EB;
+  --color-stardust: #94A3B8;
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-space);
 }
 
 :root {
-  --foreground-rgb: 255, 255, 255;
+  color-scheme: dark;
+  --foreground-rgb: 229, 231, 235;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--color-space-900);
-  color: white;
-  overflow: hidden; /* Impede qualquer rolagem */
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--color-space-950);
+  color: var(--color-starlight);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: rgba(139, 92, 246, 0.35);
+  color: #fff;
+}
+
+/* Scrollbar refinada */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0C10;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8B5CF6 0%, #06B6D4 100%);
+  border-radius: 999px;
+  border: 2px solid #0B0C10;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #A78BFA 0%, #67E8F9 100%);
+}
+
+/* Utilitários de gradiente para texto */
+.text-gradient {
+  background: linear-gradient(135deg, #C4B5FD 0%, #67E8F9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Glow suave usado em destaques */
+.glow-purple {
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.35), 0 0 60px rgba(139, 92, 246, 0.15);
+}
+.glow-cyan {
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.3), 0 0 60px rgba(6, 182, 212, 0.12);
+}
+
+/* Borda animada usada em cards de projeto */
+.card-glow {
+  position: relative;
+  isolation: isolate;
+}
+.card-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.6), rgba(6,182,212,0.4), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+/* Animação sutil do gradiente do hero */
+@keyframes auroraShift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: .6; }
+  50% { transform: translate3d(0, -2%, 0) scale(1.05); opacity: .85; }
+}
+.aurora {
+  animation: auroraShift 14s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: .2; }
+  50% { opacity: 1; }
+}
+.twinkle {
+  animation: twinkle var(--twinkle-duration, 3s) ease-in-out infinite;
+}
+
+/* Reduz movimento se o usuário preferir */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .aurora, .twinkle { animation: none; }
 }
