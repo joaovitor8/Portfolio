@@ -10,9 +10,15 @@ interface TypewriterProps {
 
 export function Typewriter({ text, speed = 70 }: TypewriterProps) {
   const [displayed, setDisplayed] = useState("");
+  const [mounted, setMounted] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplayed(reduceMotion ? text : "");
     if (reduceMotion) return;
@@ -23,7 +29,7 @@ export function Typewriter({ text, speed = 70 }: TypewriterProps) {
       if (i >= text.length) window.clearInterval(interval);
     }, speed);
     return () => window.clearInterval(interval);
-  }, [text, speed, reduceMotion]);
+  }, [text, speed, reduceMotion, mounted]);
 
   return (
     // Reserva espaço para o texto completo via cópia invisível, evitando layout shift.
@@ -33,10 +39,10 @@ export function Typewriter({ text, speed = 70 }: TypewriterProps) {
       </span>
       <span className="absolute left-0 top-0 whitespace-nowrap">
         {displayed}
-        {!reduceMotion && (
+        {mounted && !reduceMotion && (
           <span
             aria-hidden="true"
-            className="ml-1 inline-block h-[0.9em] w-0.5 -translate-y-[0.05em] bg-current align-middle animate-pulse"
+            className="ml-1 inline-block h-[0.9em] w-0.5 translate-y-[-0.05em] bg-current align-middle animate-pulse"
           />
         )}
       </span>
